@@ -24,9 +24,14 @@ class Heap:
             ) - 1] = self.storage[self.get_size() - 1], self.storage[0]
             deleted = self.storage.pop(self.get_size() - 1)
             node_index = 0
-
+            while self.storage[node_index] < self.storage[2 * node_index + 1] or \
+                    self.storage[node_index] < self.storage[2 * node_index + 2]:
+                new_index = self._sift_down(node_index)
+                if new_index != node_index:
+                    node_index = new_index
+            return deleted
         else:
-            self.storage.pop(0)
+            return self.storage.pop(0)
 
     # `get_max` returns the maximum value in the heap _in constant time_.
     def get_max(self):
