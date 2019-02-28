@@ -6,19 +6,27 @@ class Heap:
     # that the inserted value is in the correct spot in the heap.
     def insert(self, value):
         self.storage.append(value)
-        # if self.get_size() > 1:
-        #     node_index = self.get_size() - 1
-        #     while self.storage[node_index] > self.storage[(node_index - 1) // 2] and (node_index - 1) // 2 >= 0:
-        #         node_parent = (node_index - 1) // 2
-        #         self.storage[node_index], self.storage[node_parent] = self.storage[node_parent], self.storage[node_index]
-        #         node_index = node_parent
+        if self.get_size() > 1:
+            node_index = self.get_size() - 1
+            node_parent = (node_index - 1) // 2
+            while self.storage[node_parent] > self.storage[node_index] and node_parent >= 0:
+                new_index = self._bubble_up(node_index)
+                if new_index == node_parent:
+                    node_index = new_index
+                    node_parent = (node_index - 1) // 2
 
     # `delete` removes and returns the 'topmost' value from the heap; this
     # method needs to ensure that the heap property is maintained after the
     # topmost element has been removed.
-
     def delete(self):
-        pass
+        if self.get_size() > 2:
+            self.storage[0], self.storage[self.get_size(
+            ) - 1] = self.storage[self.get_size() - 1], self.storage[0]
+            deleted = self.storage.pop(self.get_size() - 1)
+            node_index = 0
+
+        else:
+            self.storage.pop(0)
 
     # `get_max` returns the maximum value in the heap _in constant time_.
     def get_max(self):
@@ -43,19 +51,20 @@ class Heap:
     # which child has a larger value. If the larger child's value is larger
     # than the parent's value, the child element is swapped with the parent.
     def _sift_down(self, index):
-        left_child = 2 * index + 1
-        right_child = 2 * index + 2
-        # TODO: Need case to check if children are either leaf nodes or out of bounds
-        if self.storage[index] < self.storage[left_child] and self.storage[index] > self.storage[right_child]:
-            self.storage[index], self.storage[left_child] = self.storage[left_child], self.storage[index]
-            return left_child
-        elif self.storage[index] > self.storage[left_child] and self.storage[index] < self.storage[right_child]:
-            self.storage[index], self.storage[right_child] = self.storage[right_child], self.storage[index]
-            return right_child
-        # Could have extended elif #1 with an `or` + elif #2 logic, but that
-        # would have just been long and difficult to read.
-        elif self.storage[left_child] == self.storage[right_child] and self.storage[index] < self.storage[right_child]:
-            self.storage[index], self.storage[right_child] = self.storage[right_child], self.storage[index]
-            return right_child
-        else:
+        # Ternary shenanigans to determine which child value is larger, then
+        # saving the index of the larger (or rightmost when equal) one.
+        work_child = 2 * index + 1 \
+            if self.storage[2 * index + 1] > self.storage[2 * index + 2] \
+            else 2 * index + 2
+
+        # If child index is greater than last index, or child's children are
+        # both greater than the last index.
+        if work_child > self.get_size() - 1 or \
+                (2 * work_child + 1 > self.get_size() - 1 and 2 * work_child + 2 > self.get_size() - 1):
             return index
+        else:
+            if self.storage[index] < self.storage[work_child]:
+                self.storage[index], self.storage[work_child] = self.storage[work_child], self.storage[index]
+                return work_child
+            else:
+                return index
