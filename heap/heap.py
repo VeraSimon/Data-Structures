@@ -25,9 +25,9 @@ class Heap:
         #     return deleted
         # else:
         #     return self.storage.pop(0)
-        self.storage[0], self.storage[self.get_size() - 1] = \
-            self.storage[self.get_size() - 1], self.storage[0]
-        deleted = self.storage.pop()
+        deleted = self.get_max()
+        self.storage[0] = self.storage[self.get_size() - 1]
+        self.storage.pop()
         self._sift_down(0)
         return deleted
 
